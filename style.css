@@ -1,0 +1,87 @@
+.div-grids{
+    display: flex;
+    flex-direction: row;
+}
+
+.panel {
+    display: flex;
+    flex-direction: row;
+}
+
+.grid-host{
+    width: 400px;
+    height: 400px;
+    min-width: 400px;
+    min-height: 400px;
+    display: flex;
+    flex-wrap: wrap;
+    background-color: rgb(46, 113, 139);
+    margin: 20px;
+}
+.grid-guest{
+    width: 400px;
+    height: 400px;
+    min-width: 400px;
+    min-height: 400px;
+    display: flex;
+    flex-wrap: wrap;
+    background-color: rgb(46, 113, 139);
+    margin: 20px;
+}
+
+.grid div{
+    width: 38px;
+    height: 38px;
+}
+
+.ships-container{
+    width: 220px;
+    height: 400px;
+    background-color: slateblue;
+    margin: 20px;
+}
+
+.destroyer-container{
+    width: 80px;
+    height: 40px;
+    background-color: whitesmoke;
+    display: flex;
+    margin: 5px;
+}
+.submarine-container{
+    width: 120px;
+    height: 40px;
+    background-color: whitesmoke;
+    display: flex;
+    margin: 5px;
+}
+.cruiser-container{
+    width: 120px;
+    height: 40px;
+    background-color: whitesmoke;
+    display: flex;
+    margin: 5px;
+}
+.battleship-container{
+    width: 160px;
+    height: 40px;
+    background-color: whitesmoke;
+    display: flex;
+    margin: 5px;
+}
+.carrier-container{
+    width: 200px;
+    height: 40px;
+    background-color: whitesmoke;
+    display: flex;
+    margin: 5px;
+}
+
+.ship div{
+    width: 38px;
+    height: 38px;
+}
+.ship{
+    border: solid tomato;
+    background-color: whitesmoke;
+}
