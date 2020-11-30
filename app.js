@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const hostGrid = document.querySelector('.grid-host');
     const guestGrid = document.querySelector('.grid-guest');
-    const shipsContainer = document.querySelector('.ships-grid');
+    const shipsContainer = document.querySelector('.ships-container');
     const ships = document.querySelectorAll('.ship')
     const destroyer = document.querySelector('.destroyer-container');
     const submarine = document.querySelector('.submarine-container');
@@ -67,6 +67,16 @@ document.addEventListener('DOMContentLoaded', () => {
     generate(directions, shipsArray[3], guestSquares);
     generate(directions, shipsArray[4], guestSquares);
 
+    shipsContainer.addEventListener('click', e => {
+        console.dir(e.target.parentElement)
+        console.dir(e.target.parentElement.matches('div.ship'))
+        if(e.target.parentElement.matches('div.ship'))
+            rotate(e.target.parentElement);
+    })
+
+    console.log('first ship in ships array: ',ships[0]);
+    ships[0].addEventListener('dragstart', dragStart);
+    hostSquares.forEach(square => square.addEventListener('drop', dragDrop));
 })
 
 // This function, renders the boards for the game,
@@ -90,12 +100,28 @@ function generate(dir, ship, squares){
 
     let direction = randomDirection==="horizontal" ? 1 : 10;
     let randomStart = Math.abs(Math.floor(Math.random() * squares.length - (ship.directions["horizontal"].length * direction)));
-
+    // console.log(randomStart)
 
     const isTaken = current.some(index => squares[randomStart +index].classList.contains('taken'));
     const isAtRightEdge = current.some(index => (randomStart + index) % 10 === 9)
     const isAtLeftEdge = current.some(index => (randomStart + index) % 10 === 0)
 
-    if(!isTaken && !isAtRightEdge && isAtLeftEdge) current.forEach(index => squares[randomStart + index].classList.add('taken',ship.name,'ship'))
+    if(!isTaken && !isAtRightEdge && !isAtLeftEdge) current.forEach(index => squares[randomStart + index].classList.add('taken',ship.name,'ship'))
     else generate(dir, ship, squares)
+}
+
+function rotate(ship){
+    console.log(ship)
+    console.log(ship.classList[1])
+    ship.classList.toggle(`${ship.classList[1]}-vertical`)
+}
+
+function dragStart(e){
+    console.log('start this: ', this);
+    console.log('start e.target: ', e.target);
+}
+
+function dragDrop(e){
+    console.log('drop this: ', this);
+    console.log('drop e.target: ', e.target);
 }
