@@ -1,3 +1,7 @@
+const hostSquares = [];
+const guestSquares = [];
+const width = 10;
+
 document.addEventListener('DOMContentLoaded', () => {
     const hostGrid = document.querySelector('.grid-host');
     const guestGrid = document.querySelector('.grid-guest');
@@ -10,13 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const carrier = document.querySelector('.carrier-container');
 
     const startButton = document.querySelector('#start');
-    const rotateButton = document.querySelector('#rotate');
+    const randomizeButton = document.querySelector('#randomize');
     const turnsDisplay = document.querySelector('#whose-go');
     const infoDisplay = document.querySelector('#info');
-
-    const hostSquares = [];
-    const guestSquares = [];
-    const width = 10;
 
     renderBoard(hostGrid, hostSquares, width);
     renderBoard(guestGrid, guestSquares, width);
@@ -61,15 +61,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ]
 
-    generate(directions, shipsArray[0], guestSquares);
-    generate(directions, shipsArray[1], guestSquares);
-    generate(directions, shipsArray[2], guestSquares);
-    generate(directions, shipsArray[3], guestSquares);
-    generate(directions, shipsArray[4], guestSquares);
+    const game = {
+        currentPlayer: "host",
+        score: {
+            host: {
+                destroyer: 2,
+                submarine: 3,
+                cruiser: 3,
+                battleship: 4,
+                carrier: 5,
+                total: 0
+            },
+            guest: {
+                destroyer: 2,
+                submarine: 3,
+                cruiser: 3,
+                battleship: 4,
+                carrier: 5,
+                total: 0
+            }
+        }
+    }
+    shipsArray.forEach(ship => generate(directions, ship, guestSquares));
 
     shipsContainer.addEventListener('click', e => {
-        console.dir(e.target.parentElement)
-        console.dir(e.target.parentElement.matches('div.ship'))
         if(e.target.parentElement.matches('div.ship'))
             rotate(e.target.parentElement);
     })
@@ -92,6 +107,16 @@ document.addEventListener('DOMContentLoaded', () => {
     hostGrid.addEventListener('dragleave', dragLeave);
     hostGrid.addEventListener('drop', e => {dragDrop(e, target, hostSquares, shipsContainer)});
     hostGrid.addEventListener('dragend', dragEnd);
+
+    startButton.addEventListener('click', e => {
+        guestGrid.addEventListener('click', e => revealSquare(e.target, game, turnsDisplay));
+        playGame(game, turnsDisplay);
+    })
+
+    randomizeButton.addEventListener('click', e => {
+        shipsArray.forEach(ship => generate(directions, ship, hostSquares));
+        [...shipsContainer.childNodes].forEach(node => node.remove());
+    });
 })
 
 // This function, renders the boards for the game,
@@ -99,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // the squares array to keep record of the different squares created,
 // and the width of the boards, so we know how many suqare to create.
 function renderBoard(grid, squares, width) {
+    console.log('inside renderBoard:', grid)
     for(let i = 0; i< width * width; i++){
         const square = document.createElement('div');
         square.dataset.id = i;
@@ -161,18 +187,66 @@ function dragDrop(e, target, squares, container){
     let draggedShipClass = draggedShipNameWithLastId.slice(0, -2);
     let draggedShipLastIndex = parseInt(draggedShipNameWithLastId.substr(-1));
     let draggedShipIndex = parseInt(target.shipNameWithId.substr(-1));
-    let droppedShipLastId = draggedShipLastIndex - draggedShipIndex + parseInt(e.target.dataset.id);
+    let receivingSquare = parseInt(e.target.dataset.id);
+    let droppedShipLastId = draggedShipLastIndex - draggedShipIndex + receivingSquare;
 
     let isHorizontal = target.ship.classList.length<=2;
 
     if(isHorizontal){
-        for(let i = 0; i < target.shipLength; i++){
-            squares[parseInt(e.target.dataset.id) - draggedShipIndex + i].classList.add('taken', draggedShipClass, 'ship')
+        console.log('it is horizontal');
+        if( Math.floor(droppedShipLastId/10) === Math.floor(receivingSquare/10) ){
+            console.log('it fits on the same line');
+            for(let i = 0; i < target.shipLength; i++){
+                squares[receivingSquare - draggedShipIndex + i].classList.add('taken', draggedShipClass, 'ship')
+            }
+            container.removeChild(target.ship);
+        }else{
+            // show some kind of warning...
         }
     }else{
-        for(let i = 0; i < target.shipLength; i++){
-            squares[parseInt(e.target.dataset.id) - draggedShipIndex + (10 * i)].classList.add('taken', draggedShipClass, 'ship')
+        debugger;
+        if( receivingSquare + (target.shipLength * 10) < 100 ){
+            for(let i = 0; i < target.shipLength; i++){
+                squares[receivingSquare - draggedShipIndex + (10 * i)].classList.add('taken', draggedShipClass, 'ship')
+            }
+            container.removeChild(target.ship);
+        }else{
+            //show some kind of warning...
         }
     }
-    container.removeChild(target.ship);
+}
+
+function revealSquare(square, game, turnsDisplay){
+    if( !square.classList.contains('revealed') )
+    {
+        if (square.classList.contains('taken')){
+            game.score[game.currentPlayer][square.classList[0]] -= 1;
+            game.score[game.currentPlayer].total += 1;
+            square.classList.add('revealed','hit')
+        }else {
+            square.classList.add('revealed', 'miss')
+        }
+        game.currentPlayer = game.currentPlayer === 'host' ? 'guest' : 'host';
+        if(game.score[game.currentPlayer].total === 17)
+            gameOver();
+        else
+            playGame(game, turnsDisplay);
+    }
+}
+
+function playGame(game, turnsDisplay){
+    if(game.currentPlayer === 'host'){
+        turnsDisplay.textContent = 'Your Go';
+    }else if(game.currentPlayer === 'guest'){
+        turnsDisplay.textContent = 'Opponent Go';
+        setTimeout (() => {
+            let random = Math.floor(Math.random() * hostSquares.length);
+            revealSquare(hostSquares[random], game, turnsDisplay);
+        }, 1000)
+    }else
+        return;
+}
+
+function gameOver(){
+    window.alert("Game Over");
 }
