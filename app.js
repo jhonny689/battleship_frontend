@@ -74,9 +74,24 @@ document.addEventListener('DOMContentLoaded', () => {
             rotate(e.target.parentElement);
     })
 
-    console.log('first ship in ships array: ',ships[0]);
-    ships[0].addEventListener('dragstart', dragStart);
-    hostSquares.forEach(square => square.addEventListener('drop', dragDrop));
+    
+    const target = {
+        shipNameWithId:'',
+        ship:'',
+        shipLength: 0
+    }
+    
+    shipsContainer.addEventListener('mousedown', e => {
+        grabShip(e, target);
+    })
+    // console.log('first ship in ships array: ',ships[0]);
+    ships.forEach(ship => ship.addEventListener('dragstart', e => {dragStart(e, target)}));
+    // hostGrid.addEventListener('dragstart', e => {dragStart(e, shipNameWithId, shipLength)});
+    hostGrid.addEventListener('dragover', dragOver);
+    hostGrid.addEventListener('dragenter', dragEnter);
+    hostGrid.addEventListener('dragleave', dragLeave);
+    hostGrid.addEventListener('drop', e => {dragDrop(e, target, hostSquares, shipsContainer)});
+    hostGrid.addEventListener('dragend', dragEnd);
 })
 
 // This function, renders the boards for the game,
@@ -116,12 +131,48 @@ function rotate(ship){
     ship.classList.toggle(`${ship.classList[1]}-vertical`)
 }
 
-function dragStart(e){
-    console.log('start this: ', this);
-    console.log('start e.target: ', e.target);
+function grabShip(e, target){
+    // console.log('grabShip e.target: ', e.target);
+    target['shipNameWithId'] = e.target.id;
 }
 
-function dragDrop(e){
-    console.log('drop this: ', this);
-    console.log('drop e.target: ', e.target);
+function dragStart(e, target){
+    // console.log('start e.target: ', e.target);
+    target['ship'] = e.target;
+    target['shipLength'] = e.target.childElementCount;
+}
+
+function dragOver(e){
+    e.preventDefault();
+}
+function dragEnter(e){
+    e.preventDefault();
+}
+function dragLeave(){
+    // console.warn('leaving')
+}
+
+function dragEnd(){
+
+}
+
+function dragDrop(e, target, squares, container){
+    let draggedShipNameWithLastId = target.ship.lastElementChild.id;
+    let draggedShipClass = draggedShipNameWithLastId.slice(0, -2);
+    let draggedShipLastIndex = parseInt(draggedShipNameWithLastId.substr(-1));
+    let draggedShipIndex = parseInt(target.shipNameWithId.substr(-1));
+    let droppedShipLastId = draggedShipLastIndex - draggedShipIndex + parseInt(e.target.dataset.id);
+
+    let isHorizontal = target.ship.classList.length<=2;
+
+    if(isHorizontal){
+        for(let i = 0; i < target.shipLength; i++){
+            squares[parseInt(e.target.dataset.id) - draggedShipIndex + i].classList.add('taken', draggedShipClass, 'ship')
+        }
+    }else{
+        for(let i = 0; i < target.shipLength; i++){
+            squares[parseInt(e.target.dataset.id) - draggedShipIndex + (10 * i)].classList.add('taken', draggedShipClass, 'ship')
+        }
+    }
+    container.removeChild(target.ship);
 }

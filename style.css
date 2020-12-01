@@ -36,9 +36,11 @@
 
 .ships-container{
     width: 220px;
+    min-width: 220px;
     height: 400px;
     background-color: slateblue;
     margin: 20px;
+    overflow-y: scroll;
 }
 
 .destroyer-container{
