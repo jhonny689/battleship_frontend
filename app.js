@@ -109,8 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
     hostGrid.addEventListener('dragend', dragEnd);
 
     startButton.addEventListener('click', e => {
-        guestGrid.addEventListener('click', e => revealSquare(e.target, game, turnsDisplay));
-        playGame(game, turnsDisplay);
+        guestGrid.addEventListener('click', e => revealSquare(e.target, game, turnsDisplay, guestGrid));
+        playGame(game, turnsDisplay, guestGrid);
     })
 
     randomizeButton.addEventListener('click', e => {
@@ -216,7 +216,8 @@ function dragDrop(e, target, squares, container){
     }
 }
 
-function revealSquare(square, game, turnsDisplay){
+function revealSquare(square, game, turnsDisplay, guestGrid){
+    console.log('guestGrid passed to revealSquare', guestGrid)
     if( !square.classList.contains('revealed') )
     {
         if (square.classList.contains('taken')){
@@ -226,22 +227,27 @@ function revealSquare(square, game, turnsDisplay){
         }else {
             square.classList.add('revealed', 'miss')
         }
+        document.querySelector(`#score #${game.currentPlayer}-score`).textContent = game.score[game.currentPlayer].total;
         game.currentPlayer = game.currentPlayer === 'host' ? 'guest' : 'host';
         if(game.score[game.currentPlayer].total === 17)
             gameOver();
         else
-            playGame(game, turnsDisplay);
+            playGame(game, turnsDisplay, guestGrid);
     }
 }
 
-function playGame(game, turnsDisplay){
+function playGame(game, turnsDisplay, guestGrid){
+    console.log('guestGrid passed to playGame', guestGrid);
     if(game.currentPlayer === 'host'){
         turnsDisplay.textContent = 'Your Go';
+        guestGrid.style.pointerEvents = 'auto';
     }else if(game.currentPlayer === 'guest'){
+        // document.querySelector('.grid-guest').style.pointerEvents = 'none';
+        guestGrid.style.pointerEvents = 'none';
         turnsDisplay.textContent = 'Opponent Go';
         setTimeout (() => {
             let random = Math.floor(Math.random() * hostSquares.length);
-            revealSquare(hostSquares[random], game, turnsDisplay);
+            revealSquare(hostSquares[random], game, turnsDisplay, guestGrid);
         }, 1000)
     }else
         return;
