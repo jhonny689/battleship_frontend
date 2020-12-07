@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const startButton = document.querySelector('#start');
     const randomizeButton = document.querySelector('#randomize');
     const turnsDisplay = document.querySelector('#whose-go');
-    const infoDisplay = document.querySelector('#info');
+    const resetButton = document.querySelector('#reset');
 
     renderBoard(hostGrid, hostSquares, width);
     renderBoard(guestGrid, guestSquares, width);
@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 horizontal: [0, 1, 2],
                 vertical: [0, width, width*2]
             }
+
         },
         {
             name: 'cruiser',
@@ -109,15 +110,71 @@ document.addEventListener('DOMContentLoaded', () => {
     hostGrid.addEventListener('dragend', dragEnd);
 
     startButton.addEventListener('click', e => {
-        guestGrid.addEventListener('click', e => revealSquare(e.target, game, turnsDisplay, guestGrid));
-        playGame(game, turnsDisplay, guestGrid);
+        if(shipsContainer.childElementCount==0){
+            guestGrid.addEventListener('click', e => revealSquare(e.target, game, turnsDisplay, guestGrid));
+            playGame(game, turnsDisplay, guestGrid);
+            // debugger;
+            startButton.disabled = true;
+        }else{
+            //show informative message asking player to place all his ships in Grid
+        }
     })
 
     randomizeButton.addEventListener('click', e => {
-        shipsArray.forEach(ship => generate(directions, ship, hostSquares));
-        [...shipsContainer.childNodes].forEach(node => node.remove());
+        if(shipsContainer.childElementCount == 5){
+            shipsArray.forEach(ship => generate(directions, ship, hostSquares));
+            [...shipsContainer.childNodes].forEach(node => node.remove());
+        }else {
+            reset(e,shipsContainer);
+            shipsArray.forEach(ship => generate(directions, ship, hostSquares));
+            [...shipsContainer.childNodes].forEach(node => node.remove());
+        }
+    });
+
+    resetButton.addEventListener('click', e => {
+        startButton.disabled = false;
+        reset(e, shipsContainer);
     });
 })
+
+function reset (e,shipsContainer) {
+    //one way to reset the game is to reload the page... but this cannot be reused for the randomize button
+    hostSquares.forEach(square => {
+        if(square.classList.contains('taken')){
+            square.className = '';
+        }
+    })
+    if(shipsContainer){
+        shipsContainer.innerHTML = `
+            <div class="ship destroyer-container" draggable="true">
+                <div id="destroyer-0"></div>
+                <div id="destroyer-1"></div>
+            </div>
+            <div class="ship submarine-container" draggable="true">
+                <div id="submarine-0"></div>
+                <div id="submarine-1"></div>
+                <div id="submarine-2"></div>
+            </div>
+            <div class="ship cruiser-container" draggable="true">
+                <div id="cruiser-0"></div>
+                <div id="cruiser-1"></div>
+                <div id="cruiser-2"></div>
+            </div>
+            <div class="ship battleship-container" draggable="true">
+                <div id="battleship-0"></div>
+                <div id="battleship-1"></div>
+                <div id="battleship-2"></div>
+                <div id="battleship-3"></div>
+            </div>
+            <div class="ship carrier-container" draggable="true">
+                <div id="carrier-0"></div>
+                <div id="carrier-1"></div>
+                <div id="carrier-2"></div>
+                <div id="carrier-3"></div>
+                <div id="carrier-4"></div>
+            </div>`
+    }
+}
 
 // This function, renders the boards for the game,
 // it takes in parameters the grid for which we want to create squares for,
@@ -195,6 +252,7 @@ function dragDrop(e, target, squares, container){
     if(isHorizontal){
         console.log('it is horizontal');
         if( Math.floor(droppedShipLastId/10) === Math.floor(receivingSquare/10) ){
+            const isTaken = current.some(index => squares[randomStart +index].classList.contains('taken'));
             console.log('it fits on the same line');
             for(let i = 0; i < target.shipLength; i++){
                 squares[receivingSquare - draggedShipIndex + i].classList.add('taken', draggedShipClass, 'ship')
@@ -204,8 +262,8 @@ function dragDrop(e, target, squares, container){
             // show some kind of warning...
         }
     }else{
-        debugger;
-        if( receivingSquare + (target.shipLength * 10) < 100 ){
+        // debugger;
+        if( receivingSquare + (target.shipLength-1) * 10 < 100 ){
             for(let i = 0; i < target.shipLength; i++){
                 squares[receivingSquare - draggedShipIndex + (10 * i)].classList.add('taken', draggedShipClass, 'ship')
             }
