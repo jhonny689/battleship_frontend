@@ -86,11 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     shipsArray.forEach(ship => generate(directions, ship, guestSquares));
 
-    shipsContainer.addEventListener('click', e => {
-        if(e.target.parentElement.matches('div.ship'))
-            rotate(e.target.parentElement);
-    })
-
     $(".ships-container").sortable({
   
         axis: "xy",
@@ -101,13 +96,23 @@ document.addEventListener('DOMContentLoaded', () => {
       
       });
 
+    // shipsContainer.addEventListener('click', e => {
+    //     if(e.target.parentElement.matches('div.ship'))
+    //         rotate(e.target.parentElement);
+    // })
+    $('.ships-container').click(function(e){
+        debugger;
+        if(e.target.parentElement.matches('div.ship'))
+            rotate(e.target.parentElement);
+    })
+
       const target = {
           shipNameWithId:'',
           ship:'',
           shipLength: 0
         }
         
-    $(".grid-host").droppable({
+    $(".grid-host div").droppable({
         drop: function(e){dragDrop(e, target, hostSquares, shipsContainer)}
     });
 
@@ -230,15 +235,15 @@ function rotate(ship){
 
 function grabShip(e, target){
     target['shipNameWithId'] = e.target.id;
-    target['ship'] = e.target;
-    target['shipLength'] = e.target.childElementCount;
+    target['ship'] = e.target.parentElement;
+    target['shipLength'] = e.target.parentElement.childElementCount;
     console.log('grabShip target[\'shipNAmeWithId\']: ', target['shipNameWithId']);
 }
 
 function dragStart(e, target){
     console.log('start e.target: ', e.target);
-    target['ship'] = e.target;
-    target['shipLength'] = e.target.childElementCount;
+    target['ship'] = e.target.parentElement;
+    target['shipLength'] = e.target.parentElement.childElementCount;
 }
 
 function dragOver(e){
@@ -258,7 +263,7 @@ function dragDrop(e, target, squares, container){
     let droppedShipLastId = draggedShipLastIndex - draggedShipIndex + receivingSquare;
     let droppedShipFirstId =  receivingSquare - draggedShipIndex;
 
-    let isHorizontal = target.ship.classList.length<=2;
+    let isHorizontal = target.ship.classList.length<=4;
     debugger;
     if(isHorizontal){
         // console.log('it is horizontal');
