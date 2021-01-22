@@ -247,13 +247,7 @@ function dragOver(e){
 function dragEnter(e){
     e.preventDefault();
 }
-function dragLeave(){
-    // console.warn('leaving')
-}
 
-function dragEnd(){
-
-}
 
 function dragDrop(e, target, squares, container){
     let draggedShipNameWithLastId = target.ship.lastElementChild.id;
