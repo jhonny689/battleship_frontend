@@ -124,9 +124,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // hostGrid.addEventListener('dragstart', e => {dragStart(e, shipNameWithId, shipLength)});
     hostGrid.addEventListener('dragover', dragOver);
     hostGrid.addEventListener('dragenter', dragEnter);
-    hostGrid.addEventListener('dragleave', dragLeave);
+    // hostGrid.addEventListener('dragleave', dragLeave);
     hostGrid.addEventListener('drop', e => {dragDrop(e, target, hostSquares, shipsContainer)});
-    hostGrid.addEventListener('dragend', dragEnd);
+    // hostGrid.addEventListener('dragend', dragEnd);
 
     startButton.addEventListener('click', e => {
         if(shipsContainer.childElementCount==0){
