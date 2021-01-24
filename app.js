@@ -86,36 +86,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     shipsArray.forEach(ship => generate(directions, ship, guestSquares));
 
-    $(".ships-container").sortable({
-  
-        axis: "xy",
-        revert: true,
-        scroll: false,
-        placeholder: "sortable-placeholder",
-        cursor: "move"
-      
-      });
-
-    // shipsContainer.addEventListener('click', e => {
-    //     if(e.target.parentElement.matches('div.ship'))
-    //         rotate(e.target.parentElement);
-    // })
-    $('.ships-container').click(function(e){
-        debugger;
+    shipsContainer.addEventListener('click', e => {
         if(e.target.parentElement.matches('div.ship'))
             rotate(e.target.parentElement);
     })
 
-      const target = {
-          shipNameWithId:'',
-          ship:'',
-          shipLength: 0
-        }
-        
-    $(".grid-host div").droppable({
-        drop: function(e){dragDrop(e, target, hostSquares, shipsContainer)}
-    });
-
+    
+    const target = {
+        shipNameWithId:'',
+        ship:'',
+        shipLength: 0
+    }
+    
     shipsContainer.addEventListener('mousedown', e => {
         grabShip(e, target);
     })
@@ -124,9 +106,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // hostGrid.addEventListener('dragstart', e => {dragStart(e, shipNameWithId, shipLength)});
     hostGrid.addEventListener('dragover', dragOver);
     hostGrid.addEventListener('dragenter', dragEnter);
-    // hostGrid.addEventListener('dragleave', dragLeave);
+    hostGrid.addEventListener('dragleave', dragLeave);
     hostGrid.addEventListener('drop', e => {dragDrop(e, target, hostSquares, shipsContainer)});
-    // hostGrid.addEventListener('dragend', dragEnd);
+    hostGrid.addEventListener('dragend', dragEnd);
 
     startButton.addEventListener('click', e => {
         if(shipsContainer.childElementCount==0){
@@ -234,16 +216,14 @@ function rotate(ship){
 }
 
 function grabShip(e, target){
+    // console.log('grabShip e.target: ', e.target);
     target['shipNameWithId'] = e.target.id;
-    target['ship'] = e.target.parentElement;
-    target['shipLength'] = e.target.parentElement.childElementCount;
-    console.log('grabShip target[\'shipNAmeWithId\']: ', target['shipNameWithId']);
 }
 
 function dragStart(e, target){
-    console.log('start e.target: ', e.target);
-    target['ship'] = e.target.parentElement;
-    target['shipLength'] = e.target.parentElement.childElementCount;
+    // console.log('start e.target: ', e.target);
+    target['ship'] = e.target;
+    target['shipLength'] = e.target.childElementCount;
 }
 
 function dragOver(e){
@@ -252,7 +232,13 @@ function dragOver(e){
 function dragEnter(e){
     e.preventDefault();
 }
+function dragLeave(){
+    // console.warn('leaving')
+}
 
+function dragEnd(){
+
+}
 
 function dragDrop(e, target, squares, container){
     let draggedShipNameWithLastId = target.ship.lastElementChild.id;
@@ -260,12 +246,12 @@ function dragDrop(e, target, squares, container){
     let draggedShipLastIndex = parseInt(draggedShipNameWithLastId.substr(-1));
     let draggedShipIndex = parseInt(target.shipNameWithId.substr(-1));
     let receivingSquare = parseInt(e.target.dataset.id);
-    let droppedShipLastId = draggedShipLastIndex - draggedShipIndex + receivingSquare;
     let droppedShipFirstId =  receivingSquare - draggedShipIndex;
+    let droppedShipLastId = draggedShipLastIndex - draggedShipIndex + receivingSquare;
 
-    let isHorizontal = target.ship.classList.length<=4;
-    debugger;
-    if(isHorizontal){
+    let isVertical = [...target.ship.classList].some(className => className.includes('vertical'));
+
+    if(!isVertical){
         // console.log('it is horizontal');
         let current = shipsArray.find(ship => ship.name === draggedShipClass).directions.horizontal;
         let isTaken = current.some(index => squares[droppedShipFirstId +index].classList.contains('taken'));
