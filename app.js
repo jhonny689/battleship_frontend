@@ -2,16 +2,79 @@ const hostSquares = [];
 const guestSquares = [];
 const width = 10;
 
+const directions = ["horizontal", "vertical"];
+
+const shipsArray = [
+    {
+        name: 'destroyer',
+        directions: {
+            horizontal: [0, 1],
+            vertical: [0, width]
+        }
+    },
+    {
+        name: 'submarine',
+        directions: {
+            horizontal: [0, 1, 2],
+            vertical: [0, width, width*2]
+        }
+
+    },
+    {
+        name: 'cruiser',
+        directions: {
+            horizontal: [0, 1, 2],
+            vertical: [0, width, width*2]
+        }
+    },
+    {
+        name: 'battleship',
+        directions: {
+            horizontal: [0, 1, 2, 3],
+            vertical: [0, width, width*2, width*3]
+        }
+    },
+    {
+        name: 'carrier',
+        directions: {
+            horizontal: [0, 1, 2, 3, 4],
+            vertical: [0, width, width*2, width*3, width*4]
+        }
+    }
+]
+
+const game = {
+    currentPlayer: "host",
+    score: {
+        host: {
+            destroyer: 2,
+            submarine: 3,
+            cruiser: 3,
+            battleship: 4,
+            carrier: 5,
+            total: 0
+        },
+        guest: {
+            destroyer: 2,
+            submarine: 3,
+            cruiser: 3,
+            battleship: 4,
+            carrier: 5,
+            total: 0
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const hostGrid = document.querySelector('.grid-host');
     const guestGrid = document.querySelector('.grid-guest');
     const shipsContainer = document.querySelector('.ships-container');
     const ships = document.querySelectorAll('.ship')
-    const destroyer = document.querySelector('.destroyer-container');
-    const submarine = document.querySelector('.submarine-container');
-    const cruiser = document.querySelector('.cruiser-container');
-    const battleship = document.querySelector('.battleship-container');
-    const carrier = document.querySelector('.carrier-container');
+    // const destroyer = document.querySelector('.destroyer-container');
+    // const submarine = document.querySelector('.submarine-container');
+    // const cruiser = document.querySelector('.cruiser-container');
+    // const battleship = document.querySelector('.battleship-container');
+    // const carrier = document.querySelector('.carrier-container');
 
     const startButton = document.querySelector('#start');
     const randomizeButton = document.querySelector('#randomize');
@@ -21,68 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderBoard(hostGrid, hostSquares, width);
     renderBoard(guestGrid, guestSquares, width);
 
-    const directions = ["horizontal", "vertical"];
-
-    const shipsArray = [
-        {
-            name: 'destroyer',
-            directions: {
-                horizontal: [0, 1],
-                vertical: [0, width]
-            }
-        },
-        {
-            name: 'submarine',
-            directions: {
-                horizontal: [0, 1, 2],
-                vertical: [0, width, width*2]
-            }
-
-        },
-        {
-            name: 'cruiser',
-            directions: {
-                horizontal: [0, 1, 2],
-                vertical: [0, width, width*2]
-            }
-        },
-        {
-            name: 'battleship',
-            directions: {
-                horizontal: [0, 1, 2, 3],
-                vertical: [0, width, width*2, width*3]
-            }
-        },
-        {
-            name: 'carrier',
-            directions: {
-                horizontal: [0, 1, 2, 3, 4],
-                vertical: [0, width, width*2, width*3, width*4]
-            }
-        }
-    ]
-
-    const game = {
-        currentPlayer: "host",
-        score: {
-            host: {
-                destroyer: 2,
-                submarine: 3,
-                cruiser: 3,
-                battleship: 4,
-                carrier: 5,
-                total: 0
-            },
-            guest: {
-                destroyer: 2,
-                submarine: 3,
-                cruiser: 3,
-                battleship: 4,
-                carrier: 5,
-                total: 0
-            }
-        }
-    }
     shipsArray.forEach(ship => generate(directions, ship, guestSquares));
 
     shipsContainer.addEventListener('click', e => {
@@ -245,15 +246,17 @@ function dragDrop(e, target, squares, container){
     let draggedShipLastIndex = parseInt(draggedShipNameWithLastId.substr(-1));
     let draggedShipIndex = parseInt(target.shipNameWithId.substr(-1));
     let receivingSquare = parseInt(e.target.dataset.id);
+    let droppedShipFirstId =  receivingSquare - draggedShipIndex;
     let droppedShipLastId = draggedShipLastIndex - draggedShipIndex + receivingSquare;
 
-    let isHorizontal = target.ship.classList.length<=2;
+    let isVertical = [...target.ship.classList].some(className => className.includes('vertical'));
 
-    if(isHorizontal){
-        console.log('it is horizontal');
-        if( Math.floor(droppedShipLastId/10) === Math.floor(receivingSquare/10) ){
-            const isTaken = current.some(index => squares[randomStart +index].classList.contains('taken'));
-            console.log('it fits on the same line');
+    if(!isVertical){
+        // console.log('it is horizontal');
+        let current = shipsArray.find(ship => ship.name === draggedShipClass).directions.horizontal;
+        let isTaken = current.some(index => squares[droppedShipFirstId +index].classList.contains('taken'));
+        if( Math.floor(droppedShipLastId/10) === Math.floor(receivingSquare/10) && !isTaken){
+            console.log('it fits on the same line and none of the squares are already taken');
             for(let i = 0; i < target.shipLength; i++){
                 squares[receivingSquare - draggedShipIndex + i].classList.add('taken', draggedShipClass, 'ship')
             }
@@ -262,8 +265,10 @@ function dragDrop(e, target, squares, container){
             // show some kind of warning...
         }
     }else{
-        // debugger;
-        if( receivingSquare + (target.shipLength-1) * 10 < 100 ){
+        let current = shipsArray.find(ship => ship.name === draggedShipClass).directions.vertical;
+        let isTaken = current.some(index => squares[droppedShipFirstId +index].classList.contains('taken'));
+
+        if( receivingSquare + (target.shipLength-1) * 10 < 100 && !isTaken){
             for(let i = 0; i < target.shipLength; i++){
                 squares[receivingSquare - draggedShipIndex + (10 * i)].classList.add('taken', draggedShipClass, 'ship')
             }
