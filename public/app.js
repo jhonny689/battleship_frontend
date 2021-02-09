@@ -65,7 +65,9 @@ const game = {
     }
 }
 
+
 document.addEventListener('DOMContentLoaded', () => {
+    const socket = io();
     const hostGrid = document.querySelector('.grid-host');
     const guestGrid = document.querySelector('.grid-guest');
     const shipsContainer = document.querySelector('.ships-container');
