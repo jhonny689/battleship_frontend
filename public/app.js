@@ -67,16 +67,28 @@ const game = {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    const socket = io();
     const hostGrid = document.querySelector('.grid-host');
     const guestGrid = document.querySelector('.grid-guest');
     const shipsContainer = document.querySelector('.ships-container');
     const ships = document.querySelectorAll('.ship')
-    // const destroyer = document.querySelector('.destroyer-container');
-    // const submarine = document.querySelector('.submarine-container');
-    // const cruiser = document.querySelector('.cruiser-container');
-    // const battleship = document.querySelector('.battleship-container');
-    // const carrier = document.querySelector('.carrier-container');
+    const socket = io();
+    let gameMode = "";
+    let playerNum = 0;
+    let currentPlayer = "user";
+    let ready = false;
+    let enemyReady = false;
+    let allShipsInPlace = false;
+    let shotFired = -1;
+
+    socket.on('player-number', num => {
+        if(num === -1){
+            infoDisplay.innerHTML = "Sorry, the server is full"
+        } else {
+            playerNum = parseInt(num)
+            if(playerNum === 1) currentPlayer = "enemy"
+        }
+        console.log(playerNum)
+    })
 
     const startButton = document.querySelector('#start');
     const randomizeButton = document.querySelector('#randomize');
