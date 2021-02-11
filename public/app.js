@@ -70,8 +70,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const hostGrid = document.querySelector('.grid-host');
     const guestGrid = document.querySelector('.grid-guest');
     const shipsContainer = document.querySelector('.ships-container');
-    const ships = document.querySelectorAll('.ship')
-    const socket = io();
+    const ships = document.querySelectorAll('.ship');
+
+    const singlePlayerBtn = document.querySelector('#singlePlayerButton');
+    const multiPlayerBtn = document.querySelector('#multiPlayerButton');
+
+    
     let gameMode = "";
     let playerNum = 0;
     let currentPlayer = "user";
@@ -80,15 +84,43 @@ document.addEventListener('DOMContentLoaded', () => {
     let allShipsInPlace = false;
     let shotFired = -1;
 
-    socket.on('player-number', num => {
-        if(num === -1){
-            infoDisplay.innerHTML = "Sorry, the server is full"
-        } else {
-            playerNum = parseInt(num)
-            if(playerNum === 1) currentPlayer = "enemy"
-        }
-        console.log(playerNum)
-    })
+    // Select Player Mode
+    singlePlayerButton.addEventListener('click', startSinglePlayer);
+    multiPlayerButton.addEventListener('click', startMultiPlayer);
+
+    // Multiplayer Function
+    function startMultiPlayer(){
+        gameMode = 'multiPlayer';
+
+        const socket = io();
+
+        // Get your player number
+        socket.on('player-number', num => {
+            if(num === -1){
+                infoDisplay.innerHTML = "Sorry, the server is full";
+            } else {
+                playerNum = parseInt(num);
+                if(playerNum === 1) currentPlayer = "enemy";
+            }
+            console.log(playerNum);
+        });
+    }
+
+    // Single player Function
+    function startSinglePlayer(){
+        gameMode = 'singlePlayer';
+        shipsArray.forEach(ship => generate(directions, ship, guestSquares));
+        startButton.addEventListener('click', e => {
+            if(shipsContainer.childElementCount==0){
+                guestGrid.addEventListener('click', e => revealSquare(e.target, game, turnsDisplay, guestGrid));
+                playGame(game, turnsDisplay, guestGrid);
+                // debugger;
+                startButton.disabled = true;
+            }else{
+                //show informative message asking player to place all his ships in Grid
+            }
+        });
+    }
 
     const startButton = document.querySelector('#start');
     const randomizeButton = document.querySelector('#randomize');
@@ -98,7 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderBoard(hostGrid, hostSquares, width);
     renderBoard(guestGrid, guestSquares, width);
 
-    shipsArray.forEach(ship => generate(directions, ship, guestSquares));
 
     shipsContainer.addEventListener('click', e => {
         if(e.target.parentElement.matches('div.ship'))
@@ -124,16 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
     hostGrid.addEventListener('drop', e => {dragDrop(e, target, hostSquares, shipsContainer)});
     hostGrid.addEventListener('dragend', dragEnd);
 
-    startButton.addEventListener('click', e => {
-        if(shipsContainer.childElementCount==0){
-            guestGrid.addEventListener('click', e => revealSquare(e.target, game, turnsDisplay, guestGrid));
-            playGame(game, turnsDisplay, guestGrid);
-            // debugger;
-            startButton.disabled = true;
-        }else{
-            //show informative message asking player to place all his ships in Grid
-        }
-    })
+    
 
     randomizeButton.addEventListener('click', e => {
         if(shipsContainer.childElementCount == 5){
