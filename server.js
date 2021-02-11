@@ -22,16 +22,25 @@ io.on('connection', socket => {
 
     //Find an available player number
     let playerIndex = -1;
-    for (const i in connections)
+    debugger;
+    for (const i in connections){
+        debugger;
         if (!!!connections[i]){
             playerIndex = i
             break
         }
-    
-    // tell the connecting client what player number they are
-    socket.emit('player-number', playerIndex)
+    }
         
-    console.log(`player ${playerIndex} has connected`)
-    {// ignore player 3
-    if (playerIndex === -1) return}
+        // tell the connecting client what player number they are
+        socket.emit('player-number', playerIndex)
+        
+        console.log(`player ${playerIndex} has connected`)
+        
+        // ignore player 3
+        if (playerIndex === -1) return;
+
+        connections[playerIndex] = false;
+
+        // Tell everyone what player number just connected
+        socket.broadcast.emit('player-connection', playerIndex);
 })

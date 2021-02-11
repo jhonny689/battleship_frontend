@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Get your player number
         socket.on('player-number', num => {
-            if(num === -1){
+            if(parseInt(num) === -1){
                 infoDisplay.innerHTML = "Sorry, the server is full";
             } else {
                 playerNum = parseInt(num);
@@ -104,6 +104,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             console.log(playerNum);
         });
+
+        // Another player connected/disconnected
+        socket.on('player-connection', num => {
+            console.log(`Player number ${num} has connected or disconnected`);
+        })
     }
 
     // Single player Function
