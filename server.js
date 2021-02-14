@@ -1,7 +1,7 @@
 const express = require('express')
 const path = require('path')
 const http = require('http')
-const PORT = process.env.Port || 4000
+const PORT = process.env.Port || 5000
 const socketio = require('socket.io')
 const app = express()
 const server = http.createServer(app)
@@ -18,14 +18,16 @@ const connections = [null, null]
 
 //handle a socket connection request from web client
 io.on('connection', socket => {
-    // console.log('New WS Connection')
+    console.log('New WS Connection:');
+    server.getConnections((error, count) => console.log(`count=${count}`))
 
     //Find an available player number
     let playerIndex = -1;
-    debugger;
-    for (const i in connections){
-        debugger;
+    for (const i = 0; i < connections.length; i++){
+        console.log("i = ", i , " connections[i] = ", connections[i], " my condition is: ", !!!connections[i]);
         if (!!!connections[i]){
+            connections[i]=true;
+            console.log(connections[i])
             playerIndex = i
             break
         }
