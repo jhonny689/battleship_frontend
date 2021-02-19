@@ -19,24 +19,26 @@ const connections = [null, null]
 //handle a socket connection request from web client
 io.on('connection', socket => {
     console.log('New WS Connection:');
-    server.getConnections((error, count) => console.log(`count=${count}`))
+    // server.getConnections((error, count) => console.log(`count=${count}`))
 
     //Find an available player number
     let playerIndex = -1;
-    for (const i = 0; i < connections.length; i++){
-        console.log("i = ", i , " connections[i] = ", connections[i], " my condition is: ", !!!connections[i]);
-        if (!!!connections[i]){
-            connections[i]=true;
-            console.log(connections[i])
+    for (const i in connections){
+        console.log("i = ", i , " connections[i] = ", connections[i], " my condition is: ", connections[i]==null);
+        if (connections[i]==null){
+            // connections[i]=true;
+            // console.log(connections[i])
             playerIndex = i
             break
         }
     }
         
         // tell the connecting client what player number they are
-        socket.emit('player-number', playerIndex)
+        console.log('before emitting player-number');
+        socket.emit('player-number', playerIndex);
+        console.log('after emitting player-number');
         
-        console.log(`player ${playerIndex} has connected`)
+        // console.log(`player ${playerIndex} has connected`)
         
         // ignore player 3
         if (playerIndex === -1) return;

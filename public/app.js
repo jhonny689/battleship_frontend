@@ -90,9 +90,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Multiplayer Function
     function startMultiPlayer(){
+        const socket = io();
+        console.log("Multi player mode", socket);
         gameMode = 'multiPlayer';
 
-        const socket = io();
+        
 
         // Get your player number
         socket.on('player-number', num => {
@@ -107,8 +109,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Another player connected/disconnected
         socket.on('player-connection', num => {
+            playerConnectedOrDisconnected(num);
             console.log(`Player number ${num} has connected or disconnected`);
-        })
+        });
+
+        function playerConnectedOrDisconnected(num){
+            let player = `.p${parseInt(num) + 1}`;
+            console.log('in playerConnectedOrDisconnected', parseInt(num) === playerNum, document.querySelector(`${player} .connected span`));
+            document.querySelector(`${player} .connected span`).classList.toggle('green');
+            if(parseInt(num) === playerNum)
+                document.querySelector(player).style.fontWeight = 'bold';
+        }
     }
 
     // Single player Function
