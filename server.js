@@ -47,4 +47,12 @@ io.on('connection', socket => {
 
         // Tell everyone what player number just connected
         socket.broadcast.emit('player-connection', playerIndex);
+
+        // Handle dsiconnect
+        socket.on('disconnect', () => {
+            console.log(`Player ${playerIndex} disconnected`);
+            connections[playerIndex] = null;
+            // Broadcast player's disconnection
+            socket.broadcast.emit('player-connection', playerIndex);
+        })
 })
