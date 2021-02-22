@@ -55,4 +55,9 @@ io.on('connection', socket => {
             // Broadcast player's disconnection
             socket.broadcast.emit('player-connection', playerIndex);
         })
+
+        socket.on('player-ready', () => {
+            socket.broadcast.emit('enemy-ready', playerIndex);
+            connections[playerIndex] = true;
+        });
 })

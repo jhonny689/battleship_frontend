@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startButton.addEventListener('click', e => {
             if(shipsContainer.childElementCount==0){
                 guestGrid.addEventListener('click', e => revealSquare(e.target, game, turnsDisplay, guestGrid));
-                playGame(game, turnsDisplay, guestGrid);
+                playGameSingle(game, turnsDisplay, guestGrid);
                 // debugger;
                 startButton.disabled = true;
             }else{
@@ -354,11 +354,22 @@ function revealSquare(square, game, turnsDisplay, guestGrid){
         if(game.score[game.currentPlayer].total === 17)
             gameOver();
         else
-            playGame(game, turnsDisplay, guestGrid);
+            playGameSingle(game, turnsDisplay, guestGrid);
     }
 }
+// Game Logic for multi player
+function playGameMulti(socket){
+    //if game over return
+    //if not ready socket.emit('player-ready') and ready = true and playerReady(playerNum)
+}
 
-function playGame(game, turnsDisplay, guestGrid){
+function playerReady(num){
+    let player = `.p${parseInt(num)+1}`;
+    document.querySelector(`${player} .ready span`).classList.toggle('green');
+}
+
+// Game Logic for single player
+function playGameSingle(game, turnsDisplay, guestGrid){
     console.log('guestGrid passed to playGame', guestGrid);
     if(game.currentPlayer === 'host'){
         turnsDisplay.textContent = 'Your Go';
