@@ -113,6 +113,11 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(`Player number ${num} has connected or disconnected`);
         });
 
+        // Ready  button click
+        startButton.addEventListener('click', () => {
+            playGameMulti(socket);
+        })
+
         function playerConnectedOrDisconnected(num){
             let player = `.p${parseInt(num) + 1}`;
             console.log('in playerConnectedOrDisconnected', parseInt(num) === playerNum, document.querySelector(`${player} .connected span`));
@@ -329,6 +334,7 @@ function dragDrop(e, target, squares, container){
             //show some kind of warning...
         }
     }
+    if(!container.querySelector('.ship')) allShipsInPlace = true;
 }
 
 function revealSquare(square, game, turnsDisplay, guestGrid){
