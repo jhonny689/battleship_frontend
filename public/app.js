@@ -115,7 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Ready  button click
         startButton.addEventListener('click', () => {
-            playGameMulti(socket);
+            if(allShipsInPlace) playGameMulti(socket);
+            else infoDisplay.innerHTML = "Please place all ships";
         })
 
         function playerConnectedOrDisconnected(num){
