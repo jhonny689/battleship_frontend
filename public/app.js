@@ -140,6 +140,16 @@ document.addEventListener('DOMContentLoaded', () => {
             else infoDisplay.innerHTML = "Please place all ships";
         })
 
+        // Setup event listeners for firing
+        guestGrid.forEach(square => {
+            square.addEventListener('click', () => {
+                if(currentPlayer === 'user' && ready && enemyReady){
+                    shotFired = square.dataset.id;
+                    socket.emit('fire', shotFired);
+                }
+            })
+        })
+
         function playerConnectedOrDisconnected(num){
             let player = `.p${parseInt(num) + 1}`;
             console.log('in playerConnectedOrDisconnected', parseInt(num) === playerNum, document.querySelector(`${player} .connected span`));
