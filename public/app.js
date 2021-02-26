@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.on('enemy-ready', num => {
             enemyReady =true;
             playerReady(num);
-            if(ready) playGameMulti(socket)
+            if(ready) playGameMulti(socket);
         })
 
         // Ready  button click
@@ -366,7 +366,23 @@ function revealSquare(square, game, turnsDisplay, guestGrid){
 // Game Logic for multi player
 function playGameMulti(socket){
     //if game over return
+    if(isGameOver) return;
+
     //if not ready socket.emit('player-ready') and ready = true and playerReady(playerNum)
+    if(!ready) {
+        socket.emit('player-ready');
+        ready = true;
+        playerReady(playerNum);
+    }
+
+    if(enemyReady){
+        if(currentPlayer === 'user'){
+            turnsDisplay.innerHTML = 'Your Go';
+        }
+        if(currentPlayer === 'enemy'){
+            turnsDisplay.innerHTML = 'Enemy\'s Go';
+        }
+    }
 }
 
 function playerReady(num){
