@@ -116,10 +116,22 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(`Player number ${num} has connected or disconnected`);
         });
 
+        // on enemy ready
         socket.on('enemy-ready', num => {
             enemyReady =true;
             playerReady(num);
             if(ready) playGameMulti(socket);
+        })
+
+        //check player status
+        socket.on('check-players', players => {
+            players.foreach((p, i) => {
+                if(p.connected) playerConnectedOrDisconnected(i);
+                if(p.ready){
+                    playerReady(i);
+                    if(i !== playerReady) enemyReady = true;
+                }
+            })
         })
 
         // Ready  button click
