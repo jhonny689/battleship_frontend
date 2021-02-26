@@ -113,6 +113,12 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(`Player number ${num} has connected or disconnected`);
         });
 
+        socket.on('enemy-ready', num => {
+            enemyReady =true;
+            playerReady(num);
+            if(ready) playGameMulti(socket)
+        })
+
         // Ready  button click
         startButton.addEventListener('click', () => {
             if(allShipsInPlace) playGameMulti(socket);
